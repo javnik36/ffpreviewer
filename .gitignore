@@ -1,0 +1,9 @@
+# FF files
+*.sfd-*
+*.sfd~
+*.ttf
+*.pdf
+*.ps
+
+# subfolders
+*/*
