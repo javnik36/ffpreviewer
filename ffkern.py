@@ -66,7 +66,7 @@ def generate_kern_pairs():
     #font.getLookupInfo
     #font.printSample
 
-def generate_all_permutations():
+def remove_non_unicode_glyphs():
     glyph_pairs_worth = []
     for item in worth_glyphs:
         glyph_repr = repr(item).split(" ")
@@ -74,6 +74,11 @@ def generate_all_permutations():
             continue
         else:
             glyph_pairs_worth.append(item)
+    return glyph_pairs_worth
+
+
+def generate_all_permutations():
+    glyph_pairs_worth = remove_non_unicode_glyphs()
 
     ff.printSetup('pdf-file',"z.pdf")
 
@@ -91,6 +96,27 @@ def generate_all_permutations():
 
     font_holder.printSample('fontsample', 14, print_sample, f"{str(__glyph_pairs_folder__.joinpath('sample_graph_pairs'))}.pdf")#remove sample text from .ps
 
+def generate_permitations_for_single_char():
+    glyph_pairs_worth = remove_non_unicode_glyphs()
+    __target_character__ = 44 #ascii encoded period
+    target_glyph = font_holder[__target_character__]
+    target_glyph_unicode_repr = chr(target_glyph.encoding)
+
+    ff.printSetup('pdf-file',"z.pdf")
+
+    print_sample = f"Permutations of {target_glyph_unicode_repr}\n"
+    sample_1st_part = ""
+    sample_2nd_part = ""
+    divider = "    "
+
+    for i in range(len(glyph_pairs_worth)-1):
+        sample_1st_part += f"{target_glyph_unicode_repr}{chr(glyph_pairs_worth[i].encoding)}{divider}"
+        sample_2nd_part += f"{chr(glyph_pairs_worth[i].encoding)}{target_glyph_unicode_repr}{divider}"
+
+    print_sample += sample_1st_part
+    print_sample += '\n\n\n\n'
+    print_sample += sample_2nd_part
+    font_holder.printSample('fontsample', 14, print_sample, "single_char_permutations.pdf")
 
 
 generate_kern_pairs()
