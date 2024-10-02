@@ -1,14 +1,13 @@
 import pathlib as pl
 import fontforge as ff
+import argparse
 
-__font_path__ = pl.Path("Arkhamic.ttf")
 __glyphs_folder__ = pl.Path("glyphs")
 
-
-def import_font(fontpath=__font_path__):
+def import_font(fontpath):
     worth_glyphs = []
 
-    font_holder = ff.open(str(__font_path__)) # ff.font obj
+    font_holder = ff.open(str(fontpath)) # ff.font obj
     for glyph in font_holder.glyphs():
         if font_holder[glyph.glyphname].isWorthOutputting():
             worth_glyphs.append(font_holder[glyph.glyphname])
@@ -58,8 +57,8 @@ def generate_kern_pairs(font_holder, worth_glyphs):
     #(("'kern' Horizontal Kerning lookup 0 subtable", 'Pair', 'W', 0, 0, 12, 0, 0, 0, 0, 0),)
     #name,typeoftable,leter,>,>,horizontal_advance
 
-def generate_all_permutations(font_holder):
-    glyph_pairs_worth = remove_non_unicode_glyphs()
+def generate_all_permutations(font_holder, worth_glyphs):
+    glyph_pairs_worth = remove_non_unicode_glyphs(worth_glyphs)
 
     setup_printing()
 
@@ -74,10 +73,10 @@ def generate_all_permutations(font_holder):
 
     font_holder.printSample('fontsample', 14, print_sample, "all_permutations.pdf") #remove sample text from .pdf (?)
 
-def generate_permitations_for_single_char(font_holder, target_character):
-    glyph_pairs_worth = remove_non_unicode_glyphs()
-    __target_character__ = 44 #ascii encoded period
-    target_glyph = font_holder[__target_character__]
+def generate_permutations_for_single_char(font_holder, worth_glyphs, target_character):
+    glyph_pairs_worth = remove_non_unicode_glyphs(worth_glyphs)
+    #__target_character__ = 44 #ascii encoded period
+    target_glyph = font_holder[target_character]
     target_glyph_unicode_repr = chr(target_glyph.encoding)
 
     setup_printing()
@@ -96,6 +95,30 @@ def generate_permitations_for_single_char(font_holder, target_character):
     print_sample += sample_2nd_part
     font_holder.printSample('fontsample', 14, print_sample, "single_char_permutations.pdf")
 
-
-generate_kern_pairs()
-generate_all_permutations()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog="ffkern",
+        description="Simple script to generate font preview files."
+    )
+    parser.add_argument("font", type=str, nargs=1, metavar="FONT PATH", help="Path to font.")
+    parser.add_argument("-i", default=argparse.SUPPRESS, nargs='?', metavar="DIR", help="Generates png file for each glyph in a font to specified DIRectory (uses default folder 'glyphs' if not provided).")#0 lub 1
+    parser.add_argument("-k", default=argparse.SUPPRESS, action='store_true', help="Generates pdf file containing all kern pairings fount in a font.")
+    parser.add_argument("-a", default=argparse.SUPPRESS, action='store_true', help="Generates pdf file containing all glyph pairs between all glyphs in a font.")
+    parser.add_argument("-s", default=argparse.SUPPRESS, nargs=1, type=int, metavar="GLYPH", help="Generates pdf file containing all glyph pairs for selected character. GLYPH = ascii encoded number of selected glyph.")
+    args = parser.parse_args()
+    
+    ff_holder, worth = import_font(pl.Path(args.font[0]))
+    if hasattr(args, "i"):
+        directory = getattr(args, "i")
+        if directory is None:
+            directory = pl.Path(__glyphs_folder__)
+        else:
+            directory = pl.Path(directory)
+        generate_glyph_files(worth, directory)
+    if hasattr(args, 'k'):
+        generate_kern_pairs(ff_holder, worth)
+    if hasattr(args, 'a'):
+        generate_all_permutations(ff_holder, worth)
+    if hasattr(args, 's'):
+        target = args.s[0]
+        generate_permutations_for_single_char(ff_holder, worth, target)
