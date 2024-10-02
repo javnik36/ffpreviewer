@@ -100,11 +100,11 @@ if __name__ == "__main__":
         prog="ffkern",
         description="Simple script to generate font preview files."
     )
-    parser.add_argument("font", type=str, nargs=1, metavar="FONT PATH", help="Path to font.")
+    parser.add_argument("font", type=str, nargs=1, metavar="FONT_PATH", help="Path to font.")
     parser.add_argument("-i", default=argparse.SUPPRESS, nargs='?', metavar="DIR", help="Generates png file for each glyph in a font to specified DIRectory (uses default folder 'glyphs' if not provided).")#0 lub 1
-    parser.add_argument("-k", default=argparse.SUPPRESS, action='store_true', help="Generates pdf file containing all kern pairings fount in a font.")
+    parser.add_argument("-k", default=argparse.SUPPRESS, action='store_true', help="Generates pdf file containing all kern pairings found in a font.")
     parser.add_argument("-a", default=argparse.SUPPRESS, action='store_true', help="Generates pdf file containing all glyph pairs between all glyphs in a font.")
-    parser.add_argument("-s", default=argparse.SUPPRESS, nargs=1, type=int, metavar="GLYPH", help="Generates pdf file containing all glyph pairs for selected character. GLYPH = ascii encoded number of selected glyph.")
+    parser.add_argument("-s", default=argparse.SUPPRESS, nargs=1, type=int, metavar="GLYPH", help="Generates pdf file containing all glyph pairs for selected character. GLYPH = ascii encoded decimal number of selected glyph.")
     args = parser.parse_args()
     
     ff_holder, worth = import_font(pl.Path(args.font[0]))
