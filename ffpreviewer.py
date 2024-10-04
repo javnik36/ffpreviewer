@@ -97,7 +97,7 @@ def generate_permutations_for_single_char(font_holder, worth_glyphs, target_char
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog="ffkern",
+        prog="ffpreviewer",
         description="Simple script to generate font preview files."
     )
     parser.add_argument("font", type=str, nargs=1, metavar="FONT_PATH", help="Path to font.")
